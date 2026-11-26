@@ -2,11 +2,13 @@
 
     make serve                 # 포트 8000
     python3 src/server.py --port 8000
+    python3 src/server.py --table linear   # 짧은 링크를 선형 탐지 테이블로 처리
 
   GET  /            URL 입력 폼
   POST /shorten     짧은 링크 화면 (잘못된 URL은 400)
   GET  /<코드>      원래 URL로 302 이동 (없으면 404)
   GET  /table       URL->코드 해시 테이블 (칸마다 연결 리스트, 호너 계산 과정)
+  GET  /table?impl=linear   같은 URL을 넣은 선형 탐지 테이블 (들여다본 칸, 계산 근거)
   POST /demo        수업 예시 URL 10개 넣기 (충돌 시연)
   POST /reset       비우기
 """
@@ -22,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from base62 import ALPHABET  # noqa: E402
 from hash_table import HashTable  # noqa: E402
+from linear_probing import LinearProbingHashTable  # noqa: E402
 from shortener import InvalidURLError, Shortener, normalize_url  # noqa: E402
 
 # 수업 슬라이드의 예시 (ftp 주소는 잘못된 입력, yonsei는 두 번)
@@ -88,6 +91,9 @@ table.steps{border-collapse:collapse;font-size:12px;margin-top:6px;width:100%}
 table.steps td,table.steps th{border-bottom:1px solid #eee;padding:2px 4px;text-align:left;
  font-family:ui-monospace,monospace;white-space:nowrap}
 table.steps tr:last-child td{font-weight:700;background:#eef5fd}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.tab{padding:8px 14px;border-radius:99px;background:#eef1f5;color:#191919;text-decoration:none;font-weight:600}
+.tab.on{background:#191919;color:#fff}
 .formula{font-family:ui-monospace,monospace;background:#eef1f5;border-radius:6px;padding:2px 6px}
 """
 
@@ -117,17 +123,40 @@ def horner_html(steps, m, title="호너 해시 계산"):
 
 
 class App:
-    def __init__(self, capacity=11):
+    """단축기 두 개를 같은 순서로 채운다: 개별 체이닝과 선형 탐지.
+
+    둘 다 같은 URL을 같은 순서로 받으므로 같은 코드를 낸다. 짧은 링크는 primary 쪽이 처리하고,
+    /table에서는 두 테이블을 나란히 볼 수 있다.
+    """
+
+    def __init__(self, capacity=11, primary="chaining"):
+        if primary not in ("chaining", "linear"):
+            raise ValueError("primary는 chaining 또는 linear")
         self.capacity = capacity
+        self.primary = primary
         self.lock = threading.Lock()
         self.clear()
 
-    def _factory(self):
-        cap = self.capacity
-        return lambda capacity=cap, max_load=2.0: HashTable(capacity=capacity, max_load=max_load)
-
     def clear(self):
-        self.shortener = Shortener(table_factory=self._factory())
+        cap = self.capacity
+        # 체이닝은 적재율 2를 넘으면, 선형 탐지는 0.9를 넘으면 늘린다
+        # (선형 탐지도 수업 예시 9개를 같은 11칸에서 볼 수 있게 0.9로 둔다)
+        self.chaining = Shortener(table_factory=lambda: HashTable(capacity=cap, max_load=2.0))
+        self.linear = Shortener(
+            table_factory=lambda: LinearProbingHashTable(capacity=cap, max_load=0.9))
+
+    @property
+    def shortener(self):
+        return self.chaining if self.primary == "chaining" else self.linear
+
+    def shorten(self, url):
+        code = self.shortener.shorten(url)
+        other = self.linear if self.primary == "chaining" else self.chaining
+        other.shorten(url)
+        return code
+
+    def expand(self, code):
+        return self.shortener.expand(code)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -197,7 +226,7 @@ class Handler(BaseHTTPRequestHandler):
         if is_code(code):
             with self.app.lock:
                 try:
-                    url = self.app.shortener.expand(code)
+                    url = self.app.expand(code)
                 except KeyError:
                     url = None
             if url is not None:
@@ -214,7 +243,7 @@ class Handler(BaseHTTPRequestHandler):
             with self.app.lock:
                 for u in DEMO_URLS:
                     try:
-                        self.app.shortener.shorten(u)
+                        self.app.shorten(u)
                     except InvalidURLError:
                         pass
             return self.redirect("/table")
@@ -237,10 +266,10 @@ class Handler(BaseHTTPRequestHandler):
     def page_home(self):
         with self.app.lock:
             n = len(self.app.shortener)
-            m = self.app.shortener.table.capacity
+            m = self.app.chaining.table.capacity
         body = ("<h1>긴 URL을 짧게</h1>" + self.form_html() +
                 "<div class='card'><div class='muted'>저장은 직접 만든 해시 테이블"
-                "(개별 체이닝, 호너 해시)로 합니다. 지금 URL %d개, 칸 %d개.</div>"
+                "(개별 체이닝과 선형 탐지, 호너 해시)로 합니다. 지금 URL %d개, 체이닝 칸 %d개.</div>"
                 "<div class='row'><form class='inline' method='post' action='/demo'>"
                 "<button class='ghost'>수업 예시 URL 10개 넣기</button></form>"
                 "<a href='/table'><button class='ghost' type='button'>해시 테이블 보기</button></a>"
@@ -254,13 +283,15 @@ class Handler(BaseHTTPRequestHandler):
                 url = v
         with self.app.lock:
             try:
-                code = self.app.shortener.shorten(url)
+                code = self.app.shorten(url)
                 normalized = self.app.shortener.expand(code)
-                table = self.app.shortener.table
+                table = self.app.chaining.table
                 idx = table.index_of(normalized)
                 steps = table.horner_steps(normalized)
                 m = table.capacity
                 chain_len = len(table.buckets()[idx])
+                lp = self.app.linear.table
+                lp_home, lp_slot = lp.index_of(normalized), lp.slot_of(normalized)
                 err = None
             except InvalidURLError as e:
                 err = str(e)
@@ -279,9 +310,12 @@ class Handler(BaseHTTPRequestHandler):
                 "onclick=\"navigator.clipboard&&navigator.clipboard.writeText('%s')\">복사</button></div>"
                 "<p class='muted url'>원래 주소: %s</p>"
                 "<p>코드 <b class='mono'>%s</b> · URL→코드 테이블의 <b>%d번 칸</b> (M = %d) %s</p>%s"
-                "<p><a href='/table?hl=%s#b%d'>해시 테이블에서 보기 →</a></p></div>%s"
+                "<p class='muted'>선형 탐지 테이블(M = %d)에서는 자기 칸 %d번, 실제로 들어간 칸 %d번</p>"
+                "<p><a href='/table?hl=%s#b%d'>해시 테이블에서 보기 →</a> · "
+                "<a href='/table?impl=linear&hl=%s#b%d'>선형 탐지로 보기 →</a></p></div>%s"
                 % (esc(short), esc(short), esc(short), esc(normalized), esc(code), idx, m, note,
-                   horner_html(steps, m), quote(code), idx, self.form_html()))
+                   horner_html(steps, m), lp.capacity, lp_home, lp_slot, quote(code), idx,
+                   quote(code), lp_slot, self.form_html()))
         self.send_html(200, "짧은 링크", body)
 
     def page_not_found(self, code):
@@ -290,17 +324,37 @@ class Handler(BaseHTTPRequestHandler):
         self.send_html(404, "없는 링크", body)
 
     def page_table(self, query):
-        hl, find = "", None
+        hl, find, impl = "", None, "chaining"
         for k, v in query:
             if k == "hl":
                 hl = v
             elif k == "find":
                 find = v
+            elif k == "impl" and v in ("chaining", "linear"):
+                impl = v
         base = self.base_url()
         with self.app.lock:
-            table = self.app.shortener.table
-            body = render_chaining(table, base, hl, find)
+            tabs = impl_tabs(impl, hl, find, self.app.primary)
+            if impl == "linear":
+                body = tabs + render_linear(self.app.linear.table, base, hl, find)
+            else:
+                body = tabs + render_chaining(self.app.chaining.table, base, hl, find)
         self.send_html(200, "해시 테이블", body)
+
+
+def impl_tabs(impl, hl, find, primary):
+    out = ["<div class='tabs'>"]
+    for key, label in (("chaining", "개별 체이닝"), ("linear", "선형 탐지")):
+        q = "impl=" + key
+        if hl:
+            q += "&hl=" + quote(hl)
+        if find:
+            q += "&find=" + quote(find)
+        mark = " (짧은 링크 처리)" if key == primary else ""
+        cls = "tab on" if key == impl else "tab"
+        out.append("<a class='%s' href='/table?%s'>%s%s</a>" % (cls, esc(q), label, mark))
+    out.append("</div>")
+    return "".join(out)
 
 
 def _safe_host(host):
@@ -312,8 +366,9 @@ def _safe_host(host):
     return True
 
 
-def find_form(find, label):
+def find_form(find, label, impl="chaining"):
     return ("<div class='card'><form method='get' action='/table'>"
+            "<input type='hidden' name='impl' value='%s'>" % esc(impl) +
             "<label for='find'><b>%s</b></label>"
             "<input type='text' id='find' name='find' value='%s' placeholder='https://...'>"
             "<div class='row'><button type='submit'>찾아보기</button></div></form></div>"
@@ -361,7 +416,7 @@ def render_chaining(table, base, hl="", find=None):
             out.append("<div class='card'><b>%s</b> 탐색: %d번 칸으로 가서 노드 <b>%d개</b>를 비교했고 %s. %s</div>"
                        % (esc(key), find_idx, cost, "찾았습니다" if hit else "없습니다",
                           horner_html(table.horner_steps(key), m)))
-    out.append(find_form(find, "URL로 찾아보기 (비교한 노드를 표시)"))
+    out.append(find_form(find, "URL로 찾아보기 (비교한 노드를 표시)", "chaining"))
     for i, chain in enumerate(buckets):
         cls = "bucket collide" if len(chain) > 1 else "bucket"
         row = ["<div class='%s' id='b%d'><div class='idx'>%d<small>칸</small></div>" % (cls, i, i)]
@@ -384,11 +439,77 @@ def render_chaining(table, base, hl="", find=None):
     return "".join(out)
 
 
-def make_server(host="0.0.0.0", port=8000, capacity=11, quiet=False):
+def render_linear(table, base, hl="", find=None):
+    m = table.capacity
+    n = len(table)
+    slots = table.slots()
+    moved = 0
+    for i, cell in enumerate(slots):
+        if cell is not None and table.index_of(cell[0]) != i:
+            moved += 1
+    out = ["<h1>URL→코드 해시 테이블 · 선형 탐지</h1>",
+           "<div class='stats'>"
+           "<div class='stat'><span class='muted'>칸 수 M</span><b>%d</b></div>"
+           "<div class='stat'><span class='muted'>URL 수 n</span><b>%d</b></div>"
+           "<div class='stat'><span class='muted'>적재율 α</span><b>%.2f</b></div>"
+           "<div class='stat'><span class='muted'>밀려난 키</span><b>%d</b></div></div>"
+           % (m, n, n / m, moved),
+           "<p class='muted'>자기 칸 = 호너 해시 <span class='formula'>h ← (31·h + 글자 코드) mod %d</span>. "
+           "자기 칸이 차 있으면 다음 칸(h+1, 끝 칸 다음은 0번)을 봅니다. "
+           "주황색 칸은 충돌 때문에 자기 칸이 아닌 곳에 들어간 키입니다.</p>" % m,
+           controls_html()]
+    path = []
+    if find:
+        try:
+            key = normalize_url(find)
+        except InvalidURLError as e:
+            key = None
+            out.append("<div class='card error'>%s</div>" % esc(e))
+        if key is not None:
+            path = table.probe_path(key)
+            hit = key in table
+            out.append("<div class='card'><b>%s</b> 탐색: 자기 칸 %d번에서 시작해 <b>%d칸</b>을 들여다봤고 %s "
+                       "(<span class='mono'>%s</span>). %s</div>"
+                       % (esc(key), table.index_of(key), len(path),
+                          "찾았습니다" if hit else "빈 칸을 만나 없다고 판단했습니다",
+                          " → ".join(str(p) for p in path),
+                          horner_html(table.horner_steps(key), m)))
+    out.append(find_form(find, "URL로 찾아보기 (들여다본 칸을 표시)", "linear"))
+    for i, cell in enumerate(slots):
+        order = 0
+        for step, p in enumerate(path):
+            if p == i:
+                order = step + 1
+        if cell is None:
+            cls = "bucket"
+            node = "<span class='null'>빈 칸</span>"
+        else:
+            url, code = cell
+            home = table.index_of(url)
+            probe = table.probe_path(url)
+            cls = "bucket collide" if home != i else "bucket"
+            ncls = "node"
+            if code == hl:
+                ncls += " hl"
+            info = ("자기 칸 %d번 · 들여다본 칸 %d개 (<span class='mono'>%s</span>)"
+                    % (home, len(probe), " → ".join(str(p) for p in probe)))
+            badge = "<span class='badge'>%d칸 밀림</span>" % ((i - home) % m) if home != i else ""
+            node = ("<div class='%s'><div class='c mono'>%s %s</div><div class='k'>%s</div>"
+                    "<div class='muted'><a href='%s/%s'>%s/%s</a></div><div class='muted'>%s</div>%s</div>"
+                    % (ncls, esc(code), badge, esc(url), esc(base), esc(code), esc(base), esc(code),
+                       info, horner_html(table.horner_steps(url), m)))
+        if order:
+            node += "<span class='badge blue'>%d번째로 봄</span>" % order
+        out.append("<div class='%s' id='b%d'><div class='idx'>%d<small>칸</small></div>"
+                   "<span class='arrow'>→</span>%s</div>" % (cls, i, i, node))
+    return "".join(out)
+
+
+def make_server(host="0.0.0.0", port=8000, capacity=11, quiet=False, primary="chaining"):
     class BoundHandler(Handler):
         pass
 
-    BoundHandler.app = App(capacity=capacity)
+    BoundHandler.app = App(capacity=capacity, primary=primary)
     BoundHandler.quiet = quiet
     return ThreadingHTTPServer((host, port), BoundHandler)
 
@@ -398,9 +519,11 @@ def main(argv=None):
     p.add_argument("--host", default="0.0.0.0")
     p.add_argument("--port", type=int, default=8000)
     p.add_argument("--capacity", type=int, default=11, help="해시 테이블의 처음 칸 수")
+    p.add_argument("--table", choices=("chaining", "linear"), default="chaining",
+                   help="짧은 링크를 처리할 해시 테이블")
     args = p.parse_args(argv)
-    httpd = make_server(args.host, args.port, args.capacity)
-    print("http://localhost:%d 에서 실행 중 (Ctrl+C로 종료)" % args.port)
+    httpd = make_server(args.host, args.port, args.capacity, primary=args.table)
+    print("http://localhost:%d 에서 실행 중 · 테이블: %s (Ctrl+C로 종료)" % (args.port, args.table))
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

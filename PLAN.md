@@ -57,3 +57,14 @@ SPEC.md를 기준으로 한다. 단계마다 테스트를 먼저 쓰고, 구현�
 - `/`, `POST /shorten`, `GET /<코드>`, `GET /table`, `POST /demo`, `POST /reset`
 - 짧은 링크 호스트: `X-Forwarded-Host` → `Host`
 - `tests/test_server.py`: 포트 0으로 서버를 띄워 W1~W6을 확인
+
+## 8. 과제: 선형 탐지
+
+- `src/linear_probing.py`의 `LinearProbingHashTable` — `HashTable`과 같은 연산
+  - 삭제는 묘비 없이 뒤로 당기기(backward shift)로 한다
+  - `max_load=None`이고 가득 찼는데 새 키를 넣으면 `TableFullError`
+  - 탐색 비용은 들여다본 칸 수 (실패는 빈 칸까지 포함, 가득 찬 테이블의 실패는 M)
+- `tests/test_linear_probing.py` — `HashTableContract`를 상속 + 끝 칸→0번 칸 넘어가기, 가득 찬 테이블
+- `tests/test_shortener.py`의 테스트를 두 테이블 모두로 돌린다
+- `experiments/compare_experiment.py` — 같은 키, M = 4093, 적재율 0.1~0.9
+- `/table?impl=linear` — 칸, 들여다본 칸, 계산 근거

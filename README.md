@@ -50,3 +50,20 @@ docker compose exec lab bash
 ```
 
 **이후 모든 `docker compose` 명령은 이 폴더에서 칩니다.**
+
+## 이 저장소에서 만든 것
+
+| 파일 | 내용 |
+| --- | --- |
+| `src/base62.py` | base62 encode/decode (`0-9a-zA-Z`, `encode(0) == "0"`) |
+| `src/hash_table.py` | 개별 체이닝 해시 테이블 (호너 해시, 소수 크기로 늘리기) |
+| `src/linear_probing.py` | 선형 탐지 해시 테이블 (같은 연산, 뒤로 당기기 삭제) |
+| `src/shortener.py` | URL 단축기 (일련번호 → base62 코드, 두 테이블 중 하나를 골라 씀) |
+| `src/server.py` | 웹 서비스 (`/`, `/<코드>`, `/table`, `/table?impl=linear`) |
+| `experiments/probe_experiment.py` | 체이닝 적재율 0.25~4 실험 → `results.csv`, `results.svg` |
+| `experiments/compare_experiment.py` | 체이닝 vs 선형 탐지 0.1~0.9 → `compare_results.csv`, `compare.svg` |
+
+- `make serve` 뒤 홈 화면의 **수업 예시 URL 10개 넣기**를 누르면 `/table`에서 같은 칸에 떨어진 URL(충돌)과 호너 계산 과정을 볼 수 있습니다.
+- `python3 src/server.py --table linear`로 띄우면 짧은 링크를 선형 탐지 테이블이 처리합니다.
+
+![체이닝 vs 선형 탐지](experiments/compare.svg)
