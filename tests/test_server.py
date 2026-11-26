@@ -100,12 +100,47 @@ class ServerTestCase(unittest.TestCase):
         self.assertEqual(resp.status, 200)
         self.assertIn("찾았습니다", data)
 
+    def test_table_linear_probing_view(self):
+        self.request("POST", "/demo", "")
+        resp, data = self.request("GET", "/table?impl=linear")
+        self.assertEqual(resp.status, 200)
+        self.assertIn("선형 탐지", data)
+        self.assertIn("자기 칸", data)
+        self.assertIn("mod 11", data)
+        resp, data = self.request("GET", "/table?" + urlencode(
+            {"impl": "linear", "find": "https://www.python.org"}))
+        self.assertIn("들여다봤고", data)
+
     # W6
     def test_html_is_escaped(self):
         resp, data = self.shorten("https://example.com/<script>alert(1)</script>")
         self.assertEqual(resp.status, 200)
         self.assertNotIn("<script>alert(1)</script>", data)
         self.assertIn("&lt;script&gt;", data)
+
+
+class LinearPrimaryServerTest(unittest.TestCase):
+    def test_short_links_served_by_linear_probing(self):
+        httpd = make_server("127.0.0.1", 0, quiet=True, primary="linear")
+        port = httpd.server_address[1]
+        t = threading.Thread(target=httpd.serve_forever, daemon=True)
+        t.start()
+        try:
+            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+            conn.request("POST", "/shorten", body=urlencode({"url": "https://github.com"}),
+                         headers={"Content-Type": "application/x-www-form-urlencoded"})
+            conn.getresponse().read()
+            conn.request("GET", "/1")
+            resp = conn.getresponse()
+            resp.read()
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.getheader("Location"), "https://github.com")
+            self.assertEqual(type(httpd.RequestHandlerClass.app.shortener.table).__name__,
+                             "LinearProbingHashTable")
+            conn.close()
+        finally:
+            httpd.shutdown()
+            httpd.server_close()
 
 
 if __name__ == "__main__":

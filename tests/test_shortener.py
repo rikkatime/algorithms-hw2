@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from base62 import encode  # noqa: E402
 from hash_table import HashTable  # noqa: E402
+from linear_probing import LinearProbingHashTable  # noqa: E402
 from shortener import InvalidURLError, Shortener  # noqa: E402
 
 
@@ -137,6 +138,15 @@ class ShortenerContract:
 
 class TestShortenerWithChaining(ShortenerContract, unittest.TestCase):
     table_factory = HashTable
+
+
+class TestShortenerWithLinearProbing(ShortenerContract, unittest.TestCase):
+    table_factory = LinearProbingHashTable
+
+    def test_uses_linear_probing_tables(self):
+        s = self.make_shortener()
+        self.assertIsInstance(s.url_to_code, LinearProbingHashTable)
+        self.assertIsInstance(s.code_to_url, LinearProbingHashTable)
 
 
 if __name__ == "__main__":
