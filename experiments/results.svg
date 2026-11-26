@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="398" viewBox="0 0 480 398" font-family="sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<line x1="16" x2="34" y1="18" y2="18" stroke="#257de0" stroke-width="2"/>
+<text x="40" y="22" font-size="12" fill="#191919">성공 · 이론 1 + α/2</text>
+<circle cx="209" cy="18" r="4.5" fill="#257de0"/>
+<text x="224" y="22" font-size="12" fill="#191919">성공 · 실험</text>
+<line x1="322.5" x2="340.5" y1="18" y2="18" stroke="#f47230" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="346.5" y="22" font-size="12" fill="#191919">실패 · 이론 α</text>
+<circle cx="25" cy="40" r="4.5" fill="#f47230"/>
+<text x="40" y="44" font-size="12" fill="#191919">실패 · 실험</text>
+<text x="56" y="72" font-size="15" font-weight="600" fill="#191919">개별 체이닝 · M = 4093</text>
+<line x1="56" x2="464" y1="342" y2="342" stroke="#e6e6e6" stroke-width="1"/>
+<text x="50" y="346" font-size="11" fill="#666666" text-anchor="end">0</text>
+<line x1="56" x2="464" y1="286" y2="286" stroke="#e6e6e6" stroke-width="1"/>
+<text x="50" y="290" font-size="11" fill="#666666" text-anchor="end">1</text>
+<line x1="56" x2="464" y1="230" y2="230" stroke="#e6e6e6" stroke-width="1"/>
+<text x="50" y="234" font-size="11" fill="#666666" text-anchor="end">2</text>
+<line x1="56" x2="464" y1="174" y2="174" stroke="#e6e6e6" stroke-width="1"/>
+<text x="50" y="178" font-size="11" fill="#666666" text-anchor="end">3</text>
+<line x1="56" x2="464" y1="118" y2="118" stroke="#e6e6e6" stroke-width="1"/>
+<text x="50" y="122" font-size="11" fill="#666666" text-anchor="end">4</text>
+<text x="56" y="358" font-size="11" fill="#666666" text-anchor="middle">0</text>
+<text x="107" y="358" font-size="11" fill="#666666" text-anchor="middle">0.5</text>
+<text x="158" y="358" font-size="11" fill="#666666" text-anchor="middle">1</text>
+<text x="209" y="358" font-size="11" fill="#666666" text-anchor="middle">1.5</text>
+<text x="260" y="358" font-size="11" fill="#666666" text-anchor="middle">2</text>
+<text x="311" y="358" font-size="11" fill="#666666" text-anchor="middle">2.5</text>
+<text x="362" y="358" font-size="11" fill="#666666" text-anchor="middle">3</text>
+<text x="413" y="358" font-size="11" fill="#666666" text-anchor="middle">3.5</text>
+<text x="464" y="358" font-size="11" fill="#666666" text-anchor="middle">4</text>
+<line x1="56" x2="464" y1="342" y2="342" stroke="#666666" stroke-width="1"/>
+<text x="260" y="380" font-size="12" fill="#666666" text-anchor="middle">적재율 α = n / M</text>
+<text transform="translate(14 216) rotate(-90)" font-size="12" fill="#666666" text-anchor="middle">평균 비교 노드 수</text>
+<clipPath id="clip050"><rect x="56" y="84" width="408" height="258"/></clipPath>
+<path d="M56.0 286.0 L61.1 284.6 L66.2 283.2 L71.3 281.8 L76.4 280.4 L81.5 279.0 L86.6 277.6 L91.7 276.2 L96.8 274.8 L101.9 273.4 L107.0 272.0 L112.1 270.6 L117.2 269.2 L122.3 267.8 L127.4 266.4 L132.5 265.0 L137.6 263.6 L142.7 262.2 L147.8 260.8 L152.9 259.4 L158.0 258.0 L163.1 256.6 L168.2 255.2 L173.3 253.8 L178.4 252.4 L183.5 251.0 L188.6 249.6 L193.7 248.2 L198.8 246.8 L203.9 245.4 L209.0 244.0 L214.1 242.6 L219.2 241.2 L224.3 239.8 L229.4 238.4 L234.5 237.0 L239.6 235.6 L244.7 234.2 L249.8 232.8 L254.9 231.4 L260.0 230.0 L265.1 228.6 L270.2 227.2 L275.3 225.8 L280.4 224.4 L285.5 223.0 L290.6 221.6 L295.7 220.2 L300.8 218.8 L305.9 217.4 L311.0 216.0 L316.1 214.6 L321.2 213.2 L326.3 211.8 L331.4 210.4 L336.5 209.0 L341.6 207.6 L346.7 206.2 L351.8 204.8 L356.9 203.4 L362.0 202.0 L367.1 200.6 L372.2 199.2 L377.3 197.8 L382.4 196.4 L387.5 195.0 L392.6 193.6 L397.7 192.2 L402.8 190.8 L407.9 189.4 L413.0 188.0 L418.1 186.6 L423.2 185.2 L428.3 183.8 L433.4 182.4 L438.5 181.0 L443.6 179.6 L448.7 178.2 L453.8 176.8 L458.9 175.4 L464.0 174.0" fill="none" stroke="#257de0" stroke-width="2" clip-path="url(#clip050)"><title>성공 · 이론 1 + α/2</title></path>
+<circle cx="81.5" cy="279.9" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=0.25: 1.109</title></circle>
+<circle cx="107.0" cy="272.4" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=0.5: 1.242</title></circle>
+<circle cx="132.5" cy="265.3" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=0.75: 1.370</title></circle>
+<circle cx="158.0" cy="258.4" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=1: 1.493</title></circle>
+<circle cx="183.5" cy="251.0" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=1.25: 1.625</title></circle>
+<circle cx="209.0" cy="243.9" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=1.5: 1.752</title></circle>
+<circle cx="234.5" cy="236.8" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=1.75: 1.878</title></circle>
+<circle cx="260.0" cy="229.9" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=2: 2.002</title></circle>
+<circle cx="285.5" cy="222.9" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=2.25: 2.127</title></circle>
+<circle cx="311.0" cy="216.2" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=2.5: 2.246</title></circle>
+<circle cx="336.5" cy="209.0" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=2.75: 2.374</title></circle>
+<circle cx="362.0" cy="201.9" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=3: 2.502</title></circle>
+<circle cx="387.5" cy="195.0" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=3.25: 2.626</title></circle>
+<circle cx="413.0" cy="188.2" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=3.5: 2.746</title></circle>
+<circle cx="438.5" cy="181.1" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=3.75: 2.873</title></circle>
+<circle cx="464.0" cy="174.1" r="4.5" fill="#257de0" stroke="#ffffff" stroke-width="2"><title>성공 · 실험 · α=4: 2.999</title></circle>
+<path d="M56.0 342.0 L61.1 339.2 L66.2 336.4 L71.3 333.6 L76.4 330.8 L81.5 328.0 L86.6 325.2 L91.7 322.4 L96.8 319.6 L101.9 316.8 L107.0 314.0 L112.1 311.2 L117.2 308.4 L122.3 305.6 L127.4 302.8 L132.5 300.0 L137.6 297.2 L142.7 294.4 L147.8 291.6 L152.9 288.8 L158.0 286.0 L163.1 283.2 L168.2 280.4 L173.3 277.6 L178.4 274.8 L183.5 272.0 L188.6 269.2 L193.7 266.4 L198.8 263.6 L203.9 260.8 L209.0 258.0 L214.1 255.2 L219.2 252.4 L224.3 249.6 L229.4 246.8 L234.5 244.0 L239.6 241.2 L244.7 238.4 L249.8 235.6 L254.9 232.8 L260.0 230.0 L265.1 227.2 L270.2 224.4 L275.3 221.6 L280.4 218.8 L285.5 216.0 L290.6 213.2 L295.7 210.4 L300.8 207.6 L305.9 204.8 L311.0 202.0 L316.1 199.2 L321.2 196.4 L326.3 193.6 L331.4 190.8 L336.5 188.0 L341.6 185.2 L346.7 182.4 L351.8 179.6 L356.9 176.8 L362.0 174.0 L367.1 171.2 L372.2 168.4 L377.3 165.6 L382.4 162.8 L387.5 160.0 L392.6 157.2 L397.7 154.4 L402.8 151.6 L407.9 148.8 L413.0 146.0 L418.1 143.2 L423.2 140.4 L428.3 137.6 L433.4 134.8 L438.5 132.0 L443.6 129.2 L448.7 126.4 L453.8 123.6 L458.9 120.8 L464.0 118.0" fill="none" stroke="#f47230" stroke-width="2" stroke-dasharray="6 5" clip-path="url(#clip050)"><title>실패 · 이론 α</title></path>
+<circle cx="81.5" cy="327.8" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=0.25: 0.254</title></circle>
+<circle cx="107.0" cy="314.1" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=0.5: 0.498</title></circle>
+<circle cx="132.5" cy="300.6" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=0.75: 0.740</title></circle>
+<circle cx="158.0" cy="286.6" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=1: 0.989</title></circle>
+<circle cx="183.5" cy="272.9" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=1.25: 1.234</title></circle>
+<circle cx="209.0" cy="258.6" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=1.5: 1.490</title></circle>
+<circle cx="234.5" cy="244.7" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=1.75: 1.738</title></circle>
+<circle cx="260.0" cy="230.8" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=2: 1.985</title></circle>
+<circle cx="285.5" cy="217.1" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=2.25: 2.231</title></circle>
+<circle cx="311.0" cy="203.4" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=2.5: 2.475</title></circle>
+<circle cx="336.5" cy="189.3" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=2.75: 2.728</title></circle>
+<circle cx="362.0" cy="175.1" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=3: 2.980</title></circle>
+<circle cx="387.5" cy="160.8" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=3.25: 3.236</title></circle>
+<circle cx="413.0" cy="146.8" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=3.5: 3.485</title></circle>
+<circle cx="438.5" cy="132.8" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=3.75: 3.736</title></circle>
+<circle cx="464.0" cy="118.2" r="4.5" fill="#f47230" stroke="#ffffff" stroke-width="2"><title>실패 · 실험 · α=4: 3.997</title></circle>
+</svg>
